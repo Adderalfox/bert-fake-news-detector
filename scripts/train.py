@@ -98,7 +98,6 @@ def evaluate(model, dataloader, device):
 def main():
     logging.info("Starting training...")
 
-    # Load and label data
     df_fake = pd.read_csv("../data/Fake.csv")
     df_real = pd.read_csv("../data/True.csv")
     df_fake["label"] = 0
@@ -106,24 +105,20 @@ def main():
     df = pd.concat([df_fake, df_real])
     df = df.sample(frac=1).reset_index(drop=True)
 
-    # Split
     train_texts, val_texts, train_labels, val_labels = train_test_split(
         df["text"].tolist(), df["label"].tolist(), test_size=0.1, random_state=SEED
     )
 
-    # Tokenizer
     tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
     train_encodings = tokenizer(train_texts, truncation=True, padding=True, max_length=MAX_LENGTH)
     val_encodings = tokenizer(val_texts, truncation=True, padding=True, max_length=MAX_LENGTH)
 
-    # Dataset & Dataloader
     train_dataset = NewsDataset(train_encodings, train_labels)
     val_dataset = NewsDataset(val_encodings, val_labels)
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
 
-    # Model, Optimizer, Loss
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
     model.to(device)
@@ -133,7 +128,6 @@ def main():
 
     best_accuracy = 0.0
 
-    # Training Loop
     for epoch in range(EPOCHS):
         logging.info(f"\nEpoch {epoch+1}/{EPOCHS}")
         train_loss = train_one_epoch(model, train_loader, optimizer, loss_fn, device)
@@ -145,7 +139,6 @@ def main():
         model.save_pretrained(f'models/checkpoints/checkpoint_{epoch+1}')
         tokenizer.save_pretrained(f'models/tokenizers/tokenizer_epoch_{epoch+1}')
 
-        # Save best model
         if val_accuracy > best_accuracy:
             best_accuracy = val_accuracy
             checkpoint_path = os.path.join(SAVE_DIR, "best_model")
