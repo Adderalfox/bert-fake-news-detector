@@ -19,7 +19,7 @@ EPOCHS = 3
 LEARNING_RATE = 5e-5
 MAX_LENGTH = 512
 MODEL_NAME = 'bert-base-uncased'
-SAVE_DIR = 'models'
+SAVE_DIR = '../models'
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 SEED = 42
