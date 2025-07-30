@@ -141,7 +141,7 @@ def main():
 
         if val_accuracy > best_accuracy:
             best_accuracy = val_accuracy
-            checkpoint_path = os.path.join(SAVE_DIR, "best_model")
+            checkpoint_path = os.path.join(SAVE_DIR, "best_model.pt")
             model.save_pretrained(checkpoint_path)
             tokenizer.save_pretrained(checkpoint_path)
             logging.info(f"Best model saved to {checkpoint_path}")
